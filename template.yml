@@ -1,17 +1,91 @@
 Resources:
-Ec2Instance:
- Type: 'AWS::EC2::Instance'
- Properties:
-   SecurityGroups:
-     - !Ref InstanceSecurityGroup
-   KeyName: udacity
-   ImageId: 'ami-068663a3c619dd892' # you may need to find out what instance types are available in your region - use https://cloud-images.ubuntu.com/locator/ec2/
-InstanceSecurityGroup:
- Type: 'AWS::EC2::SecurityGroup'
- Properties:
-   GroupDescription: Enable SSH access via port 22
-   SecurityGroupIngress:
-     - IpProtocol: tcp
-       FromPort: '22'
-       ToPort: '22'
-       CidrIp: 0.0.0.0/0
+  
+
+
+
+
+#########################################################################################################
+# Create Virtual Public Cloud + Internet Gateway
+#########################################################################################################
+  VPCPVE:
+    Type: "AWS::EC2::VPC"
+    Properties: 
+      CidrBlock: 10.0.0.0/16
+
+  InternetGatewayPVE:
+    Type: AWS::EC2::InternetGateway
+  
+ 
+  VPCGatewayAttachmentPVE:
+    Type: AWS::EC2::VPCGatewayAttachment 
+    Properties: 
+      InternetGatewayId: !Ref InternetGatewayPVE
+      VpcId: !Ref  VPCPVE
+    DependsOn:
+      - VPCPVE
+      - InternetGatewayPVE
+
+#########################################################################################################
+# Create Public Subnet
+# Route table to allow access to internet
+#########################################################################################################
+  PVESubnetPublic1:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: eu-west-3a
+      CidrBlock: 10.0.1.0/24
+      VpcId: !Ref VPCPVE
+      MapPublicIpOnLaunch: true
+
+      
+  RouteTablePVE:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      VpcId: !Ref VPCPVE
+
+  SubnetAssociationPVEFirst:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref RouteTablePVE
+      SubnetId: !Ref PVESubnetPublic1
+
+  RouteOutPve:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTablePVE
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:  !Ref   InternetGatewayPVE
+
+
+
+
+#########################################################################################################
+# Definition of our Web Servers
+#########################################################################################################
+  Ec2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      SecurityGroupIds:
+        - !Ref InstanceSecurityGroup
+      KeyName: udacity
+      InstanceType: t2.micro
+      ImageId: 'ami-0d49cec198762b78c' # you may need to find out what instance types are available in your region - use https://cloud-images.ubuntu.com/locator/ec2/
+      SubnetId: !Ref PVESubnetPublic1
+    DependsOn: InstanceSecurityGroup
+
+
+  InstanceSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Enable SSH access via port 22
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+      VpcId:  !Ref VPCPVE
+
+
+
+
+      
