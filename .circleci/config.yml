@@ -8,7 +8,7 @@ jobs:
     steps:
       - checkout
       - run:
-          command: aws cloudformation create-stack --stack-name CICDImpl --template-file template.yml
+          command: aws cloudformation create-stack --stack-name CICDImpl --template-body template.yml
   
 workflows:
   CICDImpl:
