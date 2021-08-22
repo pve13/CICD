@@ -16,8 +16,7 @@ jobs:
     steps:
       - checkout
       - run:
-            command : aws cloudformation deploy --template-file template.yml --stack-name "myStack"
-      - run:
+            aws cloudformation deploy --template-file template.yml --stack-name "myStack" |
             return 1
       - run: 
           name: on error
