@@ -33,20 +33,13 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "e6:79:98:17:14:ae:54:f5:37:6d:b1:fe:a6:56:06:02"
-
       - run:
         name: Install dependencies
-        command: |
-            apk add --update ansible # install the dependencies needed for your playbook
+        command: apk add --update ansible # install the dependencies needed for your playbook
       - run:
           name: Configure server
-          command: |
-            ansible-playbook -i inventory.txt playbook.yml
+          command: ansible-playbook -i inventory.txt playbook.yml
 
-
-
-
-  
 workflows:
   CICDImpl:
     jobs:
