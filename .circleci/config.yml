@@ -15,9 +15,10 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      - run:
-            aws cloudformation deploy --template-file template.yml --stack-name "myStack" |
-            return 1
+      - run: 
+          command: aws cloudformation deploy --template-file template.yml --stack-name "myStack"
+            
+      - run: return 1
       - run: 
           name: on error
           command: destroy_environement
