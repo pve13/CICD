@@ -9,8 +9,7 @@ jobs:
   create_infrastructure:
     <<: *dockersettings
     steps:
-      command: aws cloudformation create-stack --stack-name CICDImpl --template-body file://template.yml
- 
+      command: aws cloudformation create-stack --stack-name CICDImpl --template-file template.yml
   
 workflows:
   CICDImpl:
