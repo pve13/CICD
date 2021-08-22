@@ -16,9 +16,9 @@ jobs:
     steps:
       - checkout
       - run:
-            aws cloudformation deploy --template-file template.yml --stack-name $CIRCLE_WORKFLOW_ID
+            command : aws cloudformation deploy --template-file template.yml --stack-name $CIRCLE_WORKFLOW_ID
       - run:
-            return 1
+            command: return 1
       - destroy_environement
         when: on_fail
       
