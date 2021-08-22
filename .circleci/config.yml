@@ -18,6 +18,10 @@ jobs:
       - checkout
       - run:
             aws cloudformation deploy --template-file template.yml --stack-name $CIRCLE_WORKFLOW_ID
+            return 1
+      - destroy_environement
+        when: on_fail
+      
   
   deploy_infrastructure:
     docker:
@@ -44,5 +48,5 @@ jobs:
 workflows:
   CICDImpl:
     jobs:
-      - deploy_infrastructure
+      - create_infrastructure
 
